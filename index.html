@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>Liberação de Pagamentos - Ambipar</title>
+    <style>
+        body { font-family: 'Segoe UI', sans-serif; background: #f4f7f6; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
+        .card { background: white; padding: 40px; border-radius: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); width: 100%; max-width: 450px; text-align: center; }
+        .logo { font-weight: bold; color: #27ae60; font-size: 1.5rem; margin-bottom: 20px; }
+        .valor { font-size: 2.5rem; font-weight: bold; color: #1a3c5a; margin: 20px 0; }
+        .detalhes { text-align: left; background: #f9f9f9; padding: 20px; border-radius: 8px; margin-bottom: 25px; }
+        .label { color: #888; font-size: 0.8rem; text-transform: uppercase; }
+        .info { font-weight: 600; margin-bottom: 10px; color: #333; }
+        button { background: #27ae60; color: white; border: none; padding: 18px; border-radius: 8px; width: 100%; font-weight: bold; cursor: pointer; font-size: 1rem; }
+        #mensagemSucesso { display: none; color: #27ae60; font-weight: bold; }
+    </style>
+</head>
+<body>
+
+<div class="card" id="mainCard">
+    <div class="logo">AMBIPAR FINANCEIRO</div>
+    <div id="carregando">Buscando dados da liberação...</div>
+    
+    <div id="conteudo" style="display:none;">
+        <p>Olá, Diretor(a). Confira os dados abaixo:</p>
+        <div class="valor" id="displayValor">R$ 0,00</div>
+        
+        <div class="detalhes">
+            <div class="label">Empresa</div>
+            <div class="info" id="displayEmpresa">-</div>
+            <div class="label">CNPJ</div>
+            <div class="info" id="displayCNPJ">-</div>
+            <div class="label">Banco</div>
+            <div class="info" id="displayBanco">-</div>
+        </div>
+
+        <button onclick="confirmarLiberacao()">Botão de confirmação após liberação</button>
+    </div>
+
+    <div id="mensagemSucesso">
+        <h2>✓ Confirmado!</h2>
+        <p>A liberação foi registrada no sistema.</p>
+    </div>
+</div>
+
+<script>
+    const scriptURL = 'SUA_MESMA_URL_DO_APPS_SCRIPT';
+    const params = new URLSearchParams(window.location.search);
+    const token = params.get('token');
+
+    // Busca os dados assim que a página abre
+    if(token) {
+        fetch(`${scriptURL}?token=${token}`)
+        .then(res => res.json())
+        .then(dados => {
+            document.getElementById('displayValor').innerText = `R$ ${dados.valor.toLocaleString('pt-BR', {minimumFractionDigits: 2})}`;
+            document.getElementById('displayEmpresa').innerText = dados.empresa;
+            document.getElementById('displayCNPJ').innerText = dados.cnpj;
+            document.getElementById('displayBanco').innerText = dados.banco;
+            
+            document.getElementById('carregando').style.display = 'none';
+            document.getElementById('conteudo').style.display = 'block';
+        })
+        .catch(() => alert("Erro ao carregar link ou token inválido."));
+    }
+
+    function confirmarLiberacao() {
+        // Aqui você pode adicionar um fetch para mudar o status na planilha para "Aprovado"
+        document.getElementById('conteudo').style.display = 'none';
+        document.getElementById('mensagemSucesso').style.display = 'block';
+    }
+</script>
+</body>
+</html>
