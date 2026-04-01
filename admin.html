@@ -2,54 +2,177 @@
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
-    <title>Portal de Liberação - Ambipar</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Painel Financeiro RH - Admin Lucas</title>
     <style>
-        body { font-family: sans-serif; background: #eef2f3; padding: 20px; display: flex; justify-content: center; }
-        .card-aprovacao { background: white; padding: 30px; border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); width: 100%; max-width: 600px; }
-        .header { border-bottom: 2px solid #27ae60; margin-bottom: 20px; padding-bottom: 10px; }
-        .info-row { display: flex; justify-content: space-between; margin: 15px 0; border-bottom: 1px solid #f0f0f0; padding-bottom: 8px; }
-        .label { color: #7f8c8d; font-size: 0.9rem; }
-        .value { font-weight: bold; color: #2c3e50; }
-        .btn-confirmar { background: #27ae60; color: white; width: 100%; border: none; padding: 20px; border-radius: 8px; font-size: 1.1rem; font-weight: bold; cursor: pointer; margin-top: 20px; }
-        .btn-confirmar:active { transform: scale(0.98); }
-        .success-msg { color: #27ae60; text-align: center; display: none; font-weight: bold; }
+        /* Estilização Moderna Ambipar Style */
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f0f4f8; margin: 0; padding: 20px; color: #333; }
+        .container { max-width: 1100px; margin: auto; background: white; padding: 40px; border-radius: 15px; box-shadow: 0 10px 25px rgba(0,0,0,0.05); }
+        h2 { color: #1a3c5a; border-left: 5px solid #27ae60; padding-left: 15px; margin-bottom: 30px; }
+        
+        /* Dashboard */
+        .dashboard { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; margin-bottom: 35px; }
+        .card { padding: 25px; border-radius: 12px; color: white; text-align: center; transition: transform 0.2s; }
+        .card:hover { transform: translateY(-5px); }
+        .card h3 { margin: 0; font-size: 0.9rem; text-transform: uppercase; letter-spacing: 1px; opacity: 0.9; }
+        .card p { margin: 15px 0 0; font-size: 1.8rem; font-weight: bold; }
+        .blue { background: linear-gradient(135deg, #1e3c72, #2a5298); }
+        .green { background: linear-gradient(135deg, #27ae60, #2ecc71); }
+        .purple { background: linear-gradient(135deg, #8e44ad, #9b59b6); }
+
+        /* Area de Colagem */
+        .input-section { margin-bottom: 30px; }
+        label { display: block; margin-bottom: 10px; font-weight: bold; color: #555; }
+        textarea { width: 100%; height: 180px; border: 2px solid #e0e6ed; border-radius: 10px; padding: 15px; font-family: 'Courier New', monospace; font-size: 14px; box-sizing: border-box; transition: border-color 0.3s; }
+        textarea:focus { border-color: #27ae60; outline: none; background: #fafafa; }
+        
+        button { background: #27ae60; color: white; border: none; padding: 18px; border-radius: 8px; cursor: pointer; font-weight: bold; font-size: 1.1rem; width: 100%; margin-top: 20px; box-shadow: 0 4px 12px rgba(39, 174, 96, 0.3); transition: 0.3s; }
+        button:hover { background: #219150; box-shadow: 0 6px 15px rgba(39, 174, 96, 0.4); }
+        button:disabled { background: #bdc3c7; cursor: not-allowed; }
+
+        /* Tabela de Preview */
+        .table-container { margin-top: 40px; overflow-x: auto; border-radius: 8px; border: 1px solid #eee; }
+        table { width: 100%; border-collapse: collapse; background: white; min-width: 800px; }
+        th { background: #f8f9fa; color: #7f8c8d; font-weight: 600; text-transform: uppercase; font-size: 0.75rem; padding: 15px; text-align: left; }
+        td { padding: 15px; border-bottom: 1px solid #f1f1f1; font-size: 0.9rem; }
+        tr:last-child td { border-bottom: none; }
+        .status-ready { color: #27ae60; font-weight: bold; font-size: 0.8rem; background: #e8f5e9; padding: 4px 10px; border-radius: 20px; }
     </style>
 </head>
 <body>
 
-<div class="card-aprovacao">
-    <div class="header">
-        <h2>Liberação de Pagamento</h2>
-        <p id="nomeEmpresa">Carregando dados...</p>
+<div class="container">
+    <h2>Portal de Pagamentos RH - Admin.Lucas</h2>
+    
+    <div class="dashboard">
+        <div class="card blue"><h3>Total de Registros</h3><p id="count">0</p></div>
+        <div class="card green"><h3>Soma Total (E)</h3><p id="sum">R$ 0,00</p></div>
+        <div class="card purple"><h3>CNPJs Detectados</h3><p id="cnpjs">0</p></div>
     </div>
 
-    <div id="dadosPagamento">
-        <div class="info-row"><span class="label">Banco:</span> <span class="value" id="banco">-</span></div>
-        <div class="info-row"><span class="label">CNPJ:</span> <span class="value" id="cnpj">-</span></div>
-        <div class="info-row"><span class="label">Valor Total:</span> <span class="value" id="valor" style="font-size: 1.4rem; color: #e67e22;">-</span></div>
-        
-        <button class="btn-confirmar" onclick="confirmar()">Botão de confirmação após liberação</button>
+    <div class="input-section">
+        <label>Cole as colunas da sua planilha (A até G):</label>
+        <textarea id="excelPaste" placeholder="Dica: No Excel, selecione as colunas A até G e cole aqui..."></textarea>
     </div>
     
-    <div id="msgSucesso" class="success-msg">
-        <h3>✓ Liberação Confirmada com Sucesso!</h3>
-        <p>Obrigado, o financeiro já foi notificado.</p>
+    <div id="previewArea" style="display:none;">
+        <button id="btnEnviar" onclick="enviarParaPlanilha()">Gerar Links Mágicos e Enviar Dados</button>
+        
+        <div class="table-container">
+            <table id="dataTable">
+                <thead>
+                    <tr>
+                        <th>Banco (A)</th>
+                        <th>Empresa (B)</th>
+                        <th>CNPJ (C)</th>
+                        <th>Conta (D)</th>
+                        <th>Valor Total (E)</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+        </div>
     </div>
 </div>
 
 <script>
-    // Lógica para pegar o Token na URL e buscar os dados
-    const params = new URLSearchParams(window.location.search);
-    const token = params.get('token');
-
-    // Aqui você faria um fetch para buscar os dados do token no Google Sheets
-    // Por enquanto, simulamos o preenchimento para você ver o visual.
+    // URL que você forneceu do seu Apps Script
+    const scriptURL = 'https://script.google.com/macros/s/AKfycbx9HgssF2pLN5YpzHjKFjkPxikQKUZ3v8r5MLVzW0TAHJODh2BlQuP3u4hXnOWASUA0/exec';
     
-    function confirmar() {
-        document.getElementById('dadosPagamento').style.display = 'none';
-        document.getElementById('msgSucesso').style.display = 'block';
-        // Aqui enviaria a confirmação de volta para a planilha
+    const textArea = document.getElementById('excelPaste');
+    let dadosParaEnvio = [];
+
+    textArea.addEventListener('input', function(e) {
+        const rawContent = e.target.value.trim();
+        if (!rawContent) {
+            document.getElementById('previewArea').style.display = 'none';
+            return;
+        }
+
+        const rows = rawContent.split('\n');
+        let totalSum = 0;
+        let cnpjSet = new Set();
+        let tableHtml = '';
+        dadosParaEnvio = [];
+
+        rows.forEach(row => {
+            const cols = row.split('\t'); // Tabulação do Excel
+            
+            // Verificamos se tem pelo menos a coluna E (índice 4)
+            if (cols.length >= 5) {
+                
+                // --- TRATAMENTO DO VALOR (COLUNA E) ---
+                // Remove R$, espaços e pontos de milhar. Troca vírgula por ponto.
+                let valorTexto = cols[4].replace('R$', '').replace(/\s/g, '').replace(/\./g, '').replace(',', '.').trim();
+                let valorNum = parseFloat(valorTexto);
+
+                // Só processa se for um número válido
+                if (!isNaN(valorNum)) {
+                    totalSum += valorNum;
+                    let cnpjLimpo = cols[2].trim();
+                    cnpjSet.add(cnpjLimpo);
+                    
+                    const item = {
+                        banco: cols[0].trim(),
+                        empresa: cols[1].trim(),
+                        cnpj: cnpjLimpo,
+                        conta: cols[3].trim(),
+                        valorTotal: valorNum,
+                        valorBank: cols[5] ? cols[5].trim() : "0",
+                        valorOutros: cols[6] ? cols[6].trim() : "0"
+                    };
+                    
+                    dadosParaEnvio.push(item);
+
+                    tableHtml += `<tr>
+                        <td>${item.banco}</td>
+                        <td>${item.empresa}</td>
+                        <td>${item.cnpj}</td>
+                        <td>${item.conta}</td>
+                        <td><b>R$ ${valorNum.toLocaleString('pt-BR', {minimumFractionDigits: 2})}</b></td>
+                        <td><span class="status-ready">Pronto</span></td>
+                    </tr>`;
+                }
+            }
+        });
+
+        // Atualiza Dashboard
+        document.getElementById('count').innerText = dadosParaEnvio.length;
+        document.getElementById('sum').innerText = totalSum.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+        document.getElementById('cnpjs').innerText = cnpjSet.size;
+        
+        // Atualiza Tabela
+        document.querySelector('#dataTable tbody').innerHTML = tableHtml;
+        document.getElementById('previewArea').style.display = dadosParaEnvio.length > 0 ? 'block' : 'none';
+    });
+
+    async function enviarParaPlanilha() {
+        const btn = document.getElementById('btnEnviar');
+        btn.innerText = "🚀 Enviando para o Google Sheets...";
+        btn.disabled = true;
+
+        try {
+            // Enviando via POST para o Google Apps Script
+            await fetch(scriptURL, {
+                method: 'POST',
+                mode: 'no-cors', // Necessário para Google Scripts
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(dadosParaEnvio)
+            });
+
+            alert("✅ Dados enviados com sucesso!\nVerifique sua Planilha Google para ver os Links Mágicos gerados.");
+            textArea.value = '';
+            location.reload();
+
+        } catch (error) {
+            console.error('Erro:', error);
+            alert("❌ Erro ao conectar com o Google Sheets. Verifique se a implantação está correta.");
+            btn.disabled = false;
+            btn.innerText = "Tentar Novamente";
+        }
     }
 </script>
+
 </body>
 </html>
