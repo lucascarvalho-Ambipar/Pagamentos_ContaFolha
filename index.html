@@ -2,27 +2,32 @@
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
-    <title>Liberação de Pagamentos - Ambipar</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aprovação de Pagamentos - Ambipar</title>
     <style>
-        body { font-family: 'Segoe UI', sans-serif; background: #f4f7f6; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
-        .card { background: white; padding: 40px; border-radius: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); width: 100%; max-width: 450px; text-align: center; }
-        .logo { font-weight: bold; color: #27ae60; font-size: 1.5rem; margin-bottom: 20px; }
-        .valor { font-size: 2.5rem; font-weight: bold; color: #1a3c5a; margin: 20px 0; }
-        .detalhes { text-align: left; background: #f9f9f9; padding: 20px; border-radius: 8px; margin-bottom: 25px; }
-        .label { color: #888; font-size: 0.8rem; text-transform: uppercase; }
-        .info { font-weight: 600; margin-bottom: 10px; color: #333; }
-        button { background: #27ae60; color: white; border: none; padding: 18px; border-radius: 8px; width: 100%; font-weight: bold; cursor: pointer; font-size: 1rem; }
-        #mensagemSucesso { display: none; color: #27ae60; font-weight: bold; }
+        body { font-family: 'Segoe UI', sans-serif; background: #f0f4f8; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; }
+        .card { background: white; padding: 40px; border-radius: 15px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); width: 100%; max-width: 450px; text-align: center; }
+        .logo { font-weight: bold; color: #27ae60; font-size: 1.4rem; margin-bottom: 10px; }
+        .tag-financeiro { font-size: 0.8rem; color: #7f8c8d; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 30px; }
+        .valor { font-size: 2.8rem; font-weight: bold; color: #1a3c5a; margin: 20px 0; letter-spacing: -1px; }
+        .detalhes { text-align: left; background: #f8f9fa; padding: 20px; border-radius: 10px; margin-bottom: 25px; border-left: 4px solid #27ae60; }
+        .label { color: #95a5a6; font-size: 0.75rem; text-transform: uppercase; font-weight: bold; }
+        .info { font-weight: 600; margin-bottom: 12px; color: #2c3e50; font-size: 1rem; }
+        button { background: #27ae60; color: white; border: none; padding: 20px; border-radius: 10px; width: 100%; font-weight: bold; cursor: pointer; font-size: 1.1rem; transition: 0.3s; box-shadow: 0 4px 10px rgba(39, 174, 96, 0.2); }
+        button:hover { background: #219150; transform: translateY(-2px); }
+        #status-msg { margin-top: 20px; font-weight: bold; }
+        .loading { color: #3498db; }
     </style>
 </head>
 <body>
 
 <div class="card" id="mainCard">
-    <div class="logo">AMBIPAR FINANCEIRO</div>
-    <div id="carregando">Buscando dados da liberação...</div>
+    <div class="logo">AMBIPAR</div>
+    <div class="tag-financeiro">Portal de Liberação</div>
+    
+    <div id="loader" class="loading">Verificando token de acesso...</div>
     
     <div id="conteudo" style="display:none;">
-        <p>Olá, Diretor(a). Confira os dados abaixo:</p>
         <div class="valor" id="displayValor">R$ 0,00</div>
         
         <div class="detalhes">
@@ -34,40 +39,58 @@
             <div class="info" id="displayBanco">-</div>
         </div>
 
-        <button onclick="confirmarLiberacao()">Botão de confirmação após liberação</button>
+        <button id="btnConfirmar" onclick="confirmarLiberacao()">Botão de confirmação após liberação</button>
     </div>
 
-    <div id="mensagemSucesso">
-        <h2>✓ Confirmado!</h2>
-        <p>A liberação foi registrada no sistema.</p>
+    <div id="mensagemSucesso" style="display:none;">
+        <h2 style="color: #27ae60;">✓ Confirmado!</h2>
+        <p>A liberação foi registrada com sucesso.<br>Pode fechar esta aba.</p>
     </div>
 </div>
 
 <script>
-    const scriptURL = 'SUA_MESMA_URL_DO_APPS_SCRIPT';
+    // 1. INSIRA AQUI A SUA URL DO APPS SCRIPT (A MESMA DO ADMIN)
+    const scriptURL = 'https://script.google.com/macros/s/AKfycbx9HgssF2pLN5YpzHjKFjkPxikQKUZ3v8r5MLVzW0TAHJODh2BlQuP3u4hXnOWASUA0/exec';
+
     const params = new URLSearchParams(window.location.search);
     const token = params.get('token');
 
-    // Busca os dados assim que a página abre
-    if(token) {
+    if (!token) {
+        document.getElementById('loader').innerHTML = "❌ Erro: Link inválido ou sem token.";
+    } else {
+        // Busca os dados na planilha usando o Token
         fetch(`${scriptURL}?token=${token}`)
-        .then(res => res.json())
+        .then(response => response.json())
         .then(dados => {
-            document.getElementById('displayValor').innerText = `R$ ${dados.valor.toLocaleString('pt-BR', {minimumFractionDigits: 2})}`;
-            document.getElementById('displayEmpresa').innerText = dados.empresa;
-            document.getElementById('displayCNPJ').innerText = dados.cnpj;
-            document.getElementById('displayBanco').innerText = dados.banco;
-            
-            document.getElementById('carregando').style.display = 'none';
-            document.getElementById('conteudo').style.display = 'block';
+            if (dados.error) {
+                document.getElementById('loader').innerHTML = "❌ Pagamento não encontrado ou já processado.";
+            } else {
+                document.getElementById('displayValor').innerText = `R$ ${parseFloat(dados.valor).toLocaleString('pt-BR', {minimumFractionDigits: 2})}`;
+                document.getElementById('displayEmpresa').innerText = dados.empresa;
+                document.getElementById('displayCNPJ').innerText = dados.cnpj;
+                document.getElementById('displayBanco').innerText = dados.banco;
+                
+                document.getElementById('loader').style.display = 'none';
+                document.getElementById('conteudo').style.display = 'block';
+            }
         })
-        .catch(() => alert("Erro ao carregar link ou token inválido."));
+        .catch(err => {
+            document.getElementById('loader').innerHTML = "❌ Erro ao conectar com o servidor.";
+            console.error(err);
+        });
     }
 
     function confirmarLiberacao() {
-        // Aqui você pode adicionar um fetch para mudar o status na planilha para "Aprovado"
-        document.getElementById('conteudo').style.display = 'none';
-        document.getElementById('mensagemSucesso').style.display = 'block';
+        const btn = document.getElementById('btnConfirmar');
+        btn.innerText = "Processando...";
+        btn.disabled = true;
+
+        // Avisa a planilha que foi aprovado
+        fetch(`${scriptURL}?token=${token}&status=Aprovado`)
+        .then(() => {
+            document.getElementById('conteudo').style.display = 'none';
+            document.getElementById('mensagemSucesso').style.display = 'block';
+        });
     }
 </script>
 </body>
