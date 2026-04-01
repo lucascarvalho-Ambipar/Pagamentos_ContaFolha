@@ -3,29 +3,22 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Aprovação Financeira | Ambipar Group</title>
+    <title>Aprovação de Pagamentos | Ambipar</title>
     <style>
-        :root { --ambipar-green: #009639; --dark-blue: #1a3c5a; }
-        body { font-family: 'Segoe UI', Tahoma, sans-serif; background-color: #f4f4f4; margin: 0; display: flex; justify-content: center; align-items: center; min-height: 100vh; }
-        .card { background: white; width: 100%; max-width: 480px; border-radius: 20px; shadow: 0 15px 35px rgba(0,0,0,0.1); overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.1); }
-        .header { background: var(--ambipar-green); padding: 30px; text-align: center; color: white; }
-        .logo { width: 150px; margin-bottom: 10px; filter: brightness(0) invert(1); }
-        .content { padding: 30px; }
-        .total-box { text-align: center; margin-bottom: 25px; }
-        .total-label { font-size: 0.8rem; color: #777; text-transform: uppercase; letter-spacing: 1px; }
-        .total-value { font-size: 2.5rem; font-weight: 800; color: var(--dark-blue); }
-        
-        .breakdown { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 25px; }
-        .item { background: #f8f9fa; padding: 15px; border-radius: 12px; border-top: 3px solid var(--ambipar-green); }
-        .item-label { font-size: 0.7rem; color: #888; font-weight: bold; margin-bottom: 5px; }
-        .item-value { font-size: 1rem; color: var(--dark-blue); font-weight: 600; }
-
-        .details { font-size: 0.9rem; color: #555; border-top: 1px solid #eee; pt: 20px; padding-top: 20px; }
-        .detail-row { display: flex; justify-content: space-between; margin-bottom: 8px; }
-        
-        button { background: var(--ambipar-green); color: white; border: none; width: 100%; padding: 20px; border-radius: 12px; font-size: 1rem; font-weight: bold; cursor: pointer; transition: 0.3s; margin-top: 20px; }
-        button:hover { background: #007a2e; transform: translateY(-2px); }
-        #loader { text-align: center; padding: 50px; color: var(--ambipar-green); font-weight: bold; }
+        body { font-family: 'Segoe UI', sans-serif; background: #f4f7f6; margin: 0; display: flex; justify-content: center; align-items: center; min-height: 100vh; }
+        .card { background: white; width: 100%; max-width: 450px; border-radius: 20px; box-shadow: 0 15px 35px rgba(0,0,0,0.1); overflow: hidden; }
+        .header { background: #009639; padding: 40px 20px; text-align: center; }
+        .logo { width: 160px; filter: brightness(0) invert(1); }
+        .content { padding: 30px; text-align: center; }
+        .valor-total { font-size: 2.5rem; font-weight: bold; color: #1a3c5a; margin: 10px 0; }
+        .label { color: #888; text-transform: uppercase; font-size: 0.7rem; letter-spacing: 1px; }
+        .breakdown { display: flex; justify-content: space-between; margin: 25px 0; gap: 10px; }
+        .box { background: #f8f9fa; padding: 15px; border-radius: 10px; flex: 1; border-top: 3px solid #009639; }
+        .box-val { font-weight: bold; color: #1a3c5a; font-size: 0.9rem; }
+        .details { text-align: left; font-size: 0.85rem; color: #555; border-top: 1px solid #eee; padding-top: 20px; }
+        button { background: #009639; color: white; border: none; width: 100%; padding: 18px; border-radius: 12px; font-size: 1rem; font-weight: bold; cursor: pointer; transition: 0.3s; margin-top: 20px; }
+        button:hover { background: #007a2e; }
+        #loader { padding: 50px; color: #009639; font-weight: bold; }
     </style>
 </head>
 <body>
@@ -33,33 +26,29 @@
 <div class="card">
     <div id="loader">Carregando dados seguros...</div>
     
-    <div id="main-content" style="display:none;">
+    <div id="main" style="display:none;">
         <div class="header">
-            <img src="https://ambipar.com/wp-content/themes/ambipar/assets/images/logo-ambipar-white.png" alt="Ambipar Logo" class="logo">
-            <div>Portal de Liberação Financeira</div>
+            <img src="https://ambipar.com/wp-content/uploads/2022/05/logo-ambipar.png" class="logo">
         </div>
-        
         <div class="content">
-            <div class="total-box">
-                <div class="total-label">Valor Total do Lote</div>
-                <div class="total-value" id="valTotal">R$ 0,00</div>
-            </div>
+            <div class="label">Total para Liberação</div>
+            <div class="valor-total" id="valTotal">R$ 0,00</div>
 
             <div class="breakdown">
-                <div class="item">
-                    <div class="item-label">EDI (Bank)</div>
-                    <div class="item-value" id="valEDI">R$ 0,00</div>
+                <div class="box">
+                    <div class="label">EDI (Bank)</div>
+                    <div class="box-val" id="valEDI">R$ 0,00</div>
                 </div>
-                <div class="item">
-                    <div class="item-label">PIX (Outros)</div>
-                    <div class="item-value" id="valPix">R$ 0,00</div>
+                <div class="box">
+                    <div class="label">PIX (Outros)</div>
+                    <div class="box-val" id="valPix">R$ 0,00</div>
                 </div>
             </div>
 
             <div class="details">
-                <div class="detail-row"><span>Empresa:</span> <b id="txtEmpresa">-</b></div>
-                <div class="detail-row"><span>CNPJ:</span> <span id="txtCNPJ">-</span></div>
-                <div class="detail-row"><span>Banco Destino:</span> <span id="txtBanco">-</span></div>
+                <div style="margin-bottom: 5px;">Empresa: <b id="txtEmpresa">-</b></div>
+                <div style="margin-bottom: 5px;">CNPJ: <span id="txtCNPJ">-</span></div>
+                <div>Banco Destino: <span id="txtBanco">-</span></div>
             </div>
 
             <button onclick="confirmar()">Botão de confirmação após liberação</button>
@@ -67,13 +56,13 @@
     </div>
 
     <div id="success" style="display:none; padding: 60px 30px; text-align:center;">
-        <h2 style="color: var(--ambipar-green);">✓ Confirmado!</h2>
-        <p>A liberação foi registrada com sucesso.</p>
+        <h2 style="color: #009639;">✓ Confirmado!</h2>
+        <p>A liberação foi registrada no sistema.</p>
     </div>
 </div>
 
 <script>
-    const scriptURL = 'https://script.google.com/macros/s/AKfycbx9HgssF2pLN5YpzHjKFjkPxikQKUZ3v8r5MLVzW0TAHJODh2BlQuP3u4hXnOWASUA0/exec';
+    const scriptURL = 'SUA_URL_DO_APPS_SCRIPT_AQUI';
     const params = new URLSearchParams(window.location.search);
     const token = params.get('token');
 
@@ -81,7 +70,7 @@
         fetch(`${scriptURL}?token=${token}`)
         .then(r => r.json())
         .then(d => {
-            if(d.error) { document.getElementById('loader').innerText = "Erro: Token inválido."; return; }
+            if(d.error) { document.getElementById('loader').innerText = "Erro: Token não encontrado."; return; }
             
             document.getElementById('valTotal').innerText = `R$ ${parseFloat(d.valorTotal).toLocaleString('pt-BR', {minimumFractionDigits: 2})}`;
             document.getElementById('valEDI').innerText = `R$ ${parseFloat(d.valorEDI).toLocaleString('pt-BR', {minimumFractionDigits: 2})}`;
@@ -91,12 +80,12 @@
             document.getElementById('txtBanco').innerText = d.banco;
 
             document.getElementById('loader').style.display = 'none';
-            document.getElementById('main-content').style.display = 'block';
+            document.getElementById('main').style.display = 'block';
         });
     }
 
     function confirmar() {
-        document.getElementById('main-content').style.display = 'none';
+        document.getElementById('main').style.display = 'none';
         document.getElementById('success').style.display = 'block';
     }
 </script>
