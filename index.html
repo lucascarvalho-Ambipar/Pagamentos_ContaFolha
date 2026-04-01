@@ -2,132 +2,99 @@
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Aprovação de Pagamentos | Ambipar Group</title>
+    <title>Aprovação Financeira | AMBIPAR</title>
     <style>
-        :root { --ambipar-green: #009639; --dark-blue: #1a3c5a; }
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f4f7f6; margin: 0; display: flex; justify-content: center; align-items: center; min-height: 100vh; }
-        .card { background: white; width: 100%; max-width: 480px; border-radius: 20px; box-shadow: 0 15px 35px rgba(0,0,0,0.1); overflow: hidden; }
-        .header { background: var(--ambipar-green); padding: 40px 20px; text-align: center; }
-        .logo { width: 160px; filter: brightness(0) invert(1); margin-bottom: 10px; }
-        .header-title { color: white; font-size: 0.9rem; letter-spacing: 2px; text-transform: uppercase; opacity: 0.9; }
-        .content { padding: 30px; text-align: center; }
-        .total-box { margin-bottom: 25px; }
-        .label { color: #888; text-transform: uppercase; font-size: 0.75rem; letter-spacing: 1px; font-weight: 600; }
-        .valor-total { font-size: 2.8rem; font-weight: 800; color: var(--dark-blue); margin: 5px 0; letter-spacing: -1px; }
+        :root { --green: #009639; --blue: #1a3c5a; }
+        body { font-family: 'Segoe UI', sans-serif; background: #f0f2f5; margin: 0; padding: 20px; }
+        .card { background: white; max-width: 800px; margin: 0 auto; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.08); overflow: hidden; }
+        .header { background: var(--green); color: white; padding: 30px; text-align: center; }
+        .brand { font-size: 2.2rem; font-weight: 900; letter-spacing: 5px; margin-bottom: 5px; }
+        .header-sub { font-size: 0.8rem; opacity: 0.9; text-transform: uppercase; letter-spacing: 1px; }
+        .content { padding: 30px; }
         
-        .breakdown { display: flex; justify-content: space-between; gap: 15px; margin-bottom: 30px; }
-        .box { background: #f8f9fa; padding: 15px; border-radius: 12px; flex: 1; border-top: 4px solid var(--ambipar-green); }
-        .box-val { font-weight: 700; color: var(--dark-blue); font-size: 1rem; margin-top: 5px; }
-
-        .details { text-align: left; font-size: 0.9rem; color: #555; border-top: 1px solid #eee; padding-top: 25px; line-height: 1.6; }
-        .detail-item { display: flex; justify-content: space-between; margin-bottom: 8px; }
-        .detail-item b { color: #333; }
-
-        button { background: var(--ambipar-green); color: white; border: none; width: 100%; padding: 20px; border-radius: 12px; font-size: 1.1rem; font-weight: bold; cursor: pointer; transition: 0.3s; margin-top: 25px; box-shadow: 0 4px 12px rgba(0, 150, 57, 0.2); }
-        button:hover { background: #007a2e; transform: translateY(-2px); }
+        table { width: 100%; border-collapse: collapse; margin-top: 25px; }
+        th { background: #f8f9fa; color: #666; text-align: left; padding: 15px; border-bottom: 2px solid var(--green); font-size: 0.8rem; text-transform: uppercase; }
+        td { padding: 15px; border-bottom: 1px solid #eee; font-size: 0.95rem; }
         
-        #loader { padding: 60px; text-align: center; color: var(--ambipar-green); font-weight: bold; }
-        #error-msg { color: #e74c3c; padding: 20px; display: none; }
+        .summary { margin-top: 25px; padding: 20px; background: #f8f9fa; border-radius: 8px; text-align: right; }
+        .total-label { font-size: 0.9rem; color: #666; }
+        .total-val { font-size: 1.8rem; font-weight: bold; color: var(--green); }
+
+        .help-btn { position: fixed; bottom: 20px; right: 20px; background: var(--blue); color: white; padding: 15px 25px; border-radius: 50px; text-decoration: none; font-weight: bold; font-size: 0.9rem; box-shadow: 0 4px 15px rgba(0,0,0,0.2); transition: 0.3s; }
+        .help-btn:hover { background: var(--green); }
+
+        button.approve { background: var(--green); color: white; border: none; width: 100%; padding: 20px; border-radius: 8px; font-size: 1.1rem; font-weight: bold; cursor: pointer; margin-top: 30px; }
     </style>
 </head>
 <body>
 
 <div class="card">
-    <div id="loader">
-        <div style="margin-bottom: 15px;">Verificando credenciais seguras...</div>
-        <small style="color: #999; font-weight: normal;">Ambipar Financeiro</small>
-    </div>
-
-    <div id="error-msg" style="text-align:center;">
-        <h3>Acesso Inválido</h3>
-        <p>O token de liberação não foi encontrado ou já expirou.</p>
+    <div class="header">
+        <div class="brand">AMBIPAR</div>
+        <div class="header-sub">Gestão de Pagamentos - RH Financeiro</div>
     </div>
     
-    <div id="main-content" style="display:none;">
-        <div class="header">
-            <img src="https://ambipar.com/wp-content/uploads/2022/05/logo-ambipar.png" alt="Ambipar Logo" class="logo">
-            <div class="header-title">Liberação de Pagamentos</div>
-        </div>
+    <div class="content">
+        <div id="loader">Carregando lote seguro...</div>
         
-        <div class="content">
-            <div class="total-box">
-                <div class="label">Valor Total do Lote</div>
-                <div class="valor-total" id="valTotal">R$ 0,00</div>
-            </div>
+        <div id="main" style="display:none;">
+            <h2 id="empresaNome" style="margin:0; color: var(--blue);"></h2>
+            <p id="cnpjDados" style="color: #888; margin: 5px 0 20px 0;"></p>
+            
+            <table>
+                <thead>
+                    <tr>
+                        <th>Tipo de Pagamento</th>
+                        <th>Grupo / Banco</th>
+                        <th style="text-align:right;">Valor</th>
+                    </tr>
+                </thead>
+                <tbody id="corpoTabela"></tbody>
+            </table>
 
-            <div class="breakdown">
-                <div class="box">
-                    <div class="label">EDI (Bank)</div>
-                    <div class="box-val" id="valEDI">R$ 0,00</div>
-                </div>
-                <div class="box">
-                    <div class="label">PIX (Outros)</div>
-                    <div class="box-val" id="valPix">R$ 0,00</div>
-                </div>
+            <div class="summary">
+                <div class="total-label">VALOR TOTAL DO LOTE</div>
+                <div class="total-val" id="totalLote">R$ 0,00</div>
             </div>
-
-            <div class="details">
-                <div class="detail-item"><span>Empresa:</span> <b id="txtEmpresa">-</b></div>
-                <div class="detail-item"><span>CNPJ:</span> <span id="txtCNPJ">-</span></div>
-                <div class="detail-item"><span>Banco Destino:</span> <span id="txtBanco">-</span></div>
-            </div>
-
-            <button onclick="confirmarLiberacao()">Botão de confirmação após liberação</button>
+            
+            <button class="approve" onclick="confirmar()">Confirmar Liberação do Lote</button>
         </div>
-    </div>
-
-    <div id="success-screen" style="display:none; padding: 60px 30px; text-align:center;">
-        <div style="font-size: 50px; color: var(--ambipar-green); margin-bottom: 20px;">✓</div>
-        <h2 style="color: var(--dark-blue); margin-bottom: 10px;">Confirmado!</h2>
-        <p style="color: #666;">A liberação foi registada com sucesso no sistema financeiro.</p>
     </div>
 </div>
 
+<a href="mailto:lucas.rcarvalho@ambipar.com?subject=Dúvida sobre Liberação Financeira" class="help-btn">Precisa de ajuda?</a>
+
 <script>
-    // URL do seu Google Apps Script (Versão de Execução)
     const scriptURL = 'https://script.google.com/macros/s/AKfycbx9HgssF2pLN5YpzHjKFjkPxikQKUZ3v8r5MLVzW0TAHJODh2BlQuP3u4hXnOWASUA0/exec';
-    
-    // Captura o token da URL do navegador
-    const params = new URLSearchParams(window.location.search);
-    const token = params.get('token');
+    const token = new URLSearchParams(window.location.search).get('token');
 
-    if (!token) {
-        document.getElementById('loader').style.display = 'none';
-        document.getElementById('error-msg').style.display = 'block';
-    } else {
-        // Faz a chamada ao Google para buscar os dados do pagamento
+    if(token) {
         fetch(`${scriptURL}?token=${token}`)
-        .then(response => response.json())
-        .then(dados => {
-            if (dados.error) {
-                document.getElementById('loader').style.display = 'none';
-                document.getElementById('error-msg').style.display = 'block';
-            } else {
-                // Preenche os valores no site com formatação de moeda brasileira
-                document.getElementById('valTotal').innerText = `R$ ${parseFloat(dados.valorTotal).toLocaleString('pt-BR', {minimumFractionDigits: 2})}`;
-                document.getElementById('valEDI').innerText = `R$ ${parseFloat(dados.valorEDI).toLocaleString('pt-BR', {minimumFractionDigits: 2})}`;
-                document.getElementById('valPix').innerText = `R$ ${parseFloat(dados.valorPix).toLocaleString('pt-BR', {minimumFractionDigits: 2})}`;
-                
-                document.getElementById('txtEmpresa').innerText = dados.empresa;
-                document.getElementById('txtCNPJ').innerText = dados.cnpj;
-                document.getElementById('txtBanco').innerText = dados.banco;
-
-                // Mostra o conteúdo principal e esconde o loader
-                document.getElementById('loader').style.display = 'none';
-                document.getElementById('main-content').style.display = 'block';
-            }
-        })
-        .catch(error => {
-            console.error('Erro ao carregar dados:', error);
-            document.getElementById('loader').innerText = "Erro ao conectar com o servidor financeiro.";
+        .then(r => r.json())
+        .then(d => {
+            document.getElementById('empresaNome').innerText = d.empresa;
+            document.getElementById('cnpjDados').innerText = `CNPJ: ${d.cnpj}`;
+            
+            let total = 0;
+            const tbody = document.getElementById('corpoTabela');
+            
+            d.tabela.forEach(item => {
+                total += item.valor;
+                tbody.innerHTML += `<tr>
+                    <td>${item.tipo}</td>
+                    <td>${item.banco}</td>
+                    <td style="text-align:right;">R$ ${item.valor.toLocaleString('pt-BR', {minimumFractionDigits: 2})}</td>
+                </tr>`;
+            });
+            
+            document.getElementById('totalLote').innerText = `R$ ${total.toLocaleString('pt-BR', {minimumFractionDigits: 2})}`;
+            document.getElementById('loader').style.display = 'none';
+            document.getElementById('main').style.display = 'block';
         });
     }
 
-    function confirmarLiberacao() {
-        // Transição para tela de sucesso
-        document.getElementById('main-content').style.display = 'none';
-        document.getElementById('success-screen').style.display = 'block';
+    function confirmar() {
+        alert('Lote liberado com sucesso!');
     }
 </script>
 </body>
