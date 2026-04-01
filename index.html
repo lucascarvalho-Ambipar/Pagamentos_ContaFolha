@@ -2,77 +2,92 @@
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
-    <title>Aprovação | AMBIPAR</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aprovação Financeira | AMBIPAR</title>
     <style>
-        :root { --green: #009639; --blue: #1a3c5a; }
-        body { font-family: 'Segoe UI', sans-serif; background: #f4f7f6; padding: 20px; margin: 0; }
-        .card { background: white; max-width: 800px; margin: 0 auto; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.1); overflow: hidden; }
-        .header { background: var(--green); color: white; padding: 30px; text-align: center; font-size: 2.2rem; font-weight: 900; letter-spacing: 5px; }
+        :root { --green: #009639; --blue: #1a3c5a; --bg: #f8f9fa; }
+        body { font-family: 'Segoe UI', Tahoma, sans-serif; background: var(--bg); margin: 0; padding: 20px; color: #333; }
+        .container { max-width: 700px; margin: 0 auto; background: white; border-radius: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.05); overflow: hidden; }
+        .header { background: var(--green); color: white; padding: 40px 20px; text-align: center; }
+        .header h1 { margin: 0; letter-spacing: 6px; font-size: 2.2rem; }
         .content { padding: 30px; }
-        .summary-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin: 20px 0; }
-        .box { background: #f8f9fa; padding: 15px; border-radius: 8px; border-left: 5px solid var(--green); }
-        .box label { font-size: 0.7rem; color: #888; font-weight: bold; text-transform: uppercase; }
-        .box div { font-size: 1.4rem; font-weight: bold; color: var(--blue); }
-        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-        th { background: #f8f9fa; text-align: left; padding: 12px; border-bottom: 2px solid var(--green); color: #666; font-size: 0.75rem; }
-        td { padding: 12px; border-bottom: 1px solid #eee; font-size: 0.9rem; }
-        .total-final { background: var(--blue); color: #4ade80; padding: 20px; border-radius: 8px; text-align: right; margin-top: 25px; font-size: 2rem; font-weight: 800; }
-        #loader { text-align: center; padding: 50px; font-weight: bold; color: var(--green); }
+        .company-info { margin-bottom: 30px; border-bottom: 1px solid #eee; padding-bottom: 20px; }
+        .company-info h2 { color: var(--blue); margin: 0; font-size: 1.5rem; }
+        .company-info p { color: #888; margin: 5px 0 0; font-size: 0.9rem; }
+        
+        .summary-cards { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 30px; }
+        .card-val { background: var(--bg); padding: 20px; border-radius: 10px; border-left: 5px solid var(--green); }
+        .card-val label { display: block; font-size: 0.75rem; font-weight: bold; color: #999; text-transform: uppercase; margin-bottom: 5px; }
+        .card-val span { font-size: 1.4rem; font-weight: bold; color: var(--blue); }
+
+        table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+        th { text-align: left; font-size: 0.75rem; color: #aaa; text-transform: uppercase; padding: 12px; border-bottom: 2px solid #eee; }
+        td { padding: 15px 12px; border-bottom: 1px solid #f1f1f1; font-size: 0.95rem; }
+        .val-col { font-weight: bold; text-align: right; }
+
+        .footer-total { background: var(--blue); color: #4ade80; padding: 25px; margin-top: 30px; border-radius: 10px; display: flex; justify-content: space-between; align-items: center; }
+        .footer-total label { font-size: 0.9rem; font-weight: bold; opacity: 0.8; color: white; }
+        .footer-total span { font-size: 1.8rem; font-weight: 800; }
+
+        #loader { text-align: center; padding: 60px; font-weight: bold; color: var(--green); font-size: 1.1rem; }
     </style>
 </head>
 <body>
-    <div class="card">
-        <div class="header">AMBIPAR</div>
-        <div class="content">
-            <div id="loader">Verificando lote seguro...</div>
-            <div id="main" style="display:none;">
-                <h2 id="empresa" style="margin:0; color: var(--blue);"></h2>
-                <div id="cnpj" style="color: #888; margin-bottom: 20px;"></div>
-                <div class="summary-grid">
-                    <div class="box"><label>Total EDI</label><div id="edi">R$ 0,00</div></div>
-                    <div class="box"><label>Total PIX</label><div id="pix">R$ 0,00</div></div>
-                </div>
-                <table>
-                    <thead><tr><th>Tipo</th><th>Banco</th><th style="text-align:right;">Valor</th></tr></thead>
-                    <tbody id="tabela"></tbody>
-                </table>
-                <div class="total-final" id="total">R$ 0,00</div>
+    <div class="container">
+        <div class="header"><h1>AMBIPAR</h1></div>
+        <div id="loader">Buscando informações do lote...</div>
+        
+        <div class="content" id="main" style="display:none;">
+            <div class="company-info">
+                <h2 id="empresa"></h2>
+                <p id="cnpj"></p>
+            </div>
+
+            <div class="summary-cards">
+                <div class="card-val"><label>Total EDI</label><span id="edi"></span></div>
+                <div class="card-val"><label>Total PIX</label><span id="pix"></span></div>
+            </div>
+
+            <table>
+                <thead><tr><th>Descrição</th><th>Banco</th><th style="text-align:right;">Valor</th></tr></thead>
+                <tbody id="tabela"></tbody>
+            </table>
+
+            <div class="footer-total">
+                <label>TOTAL DO LOTE</label>
+                <span id="total"></span>
             </div>
         </div>
     </div>
 
     <script>
         const scriptURL = 'https://script.google.com/macros/s/AKfycbzAK6ehdVBM0xjW27sKLlFmMNn86235naHYczHj_t4hu0fRJCn0cyQTEqiCy8Mv6sGy/exec';
-        const urlParams = new URLSearchParams(window.location.search);
-        const token = urlParams.get('token');
+        const token = new URLSearchParams(window.location.search).get('token');
 
         if(token) {
             fetch(`${scriptURL}?token=${token}`)
-            .then(response => response.json())
+            .then(res => res.json())
             .then(data => {
-                if(data.error) {
-                    document.getElementById('loader').innerText = "Erro: Lote não encontrado ou expirado.";
-                    return;
-                }
+                if(data.error) { document.getElementById('loader').innerText = "Erro: Lote expirado ou não encontrado."; return; }
+                
                 document.getElementById('empresa').innerText = data.empresa;
                 document.getElementById('cnpj').innerText = `CNPJ: ${data.cnpj}`;
-                document.getElementById('edi').innerText = `R$ ${data.edi.toLocaleString('pt-BR',{minimumFractionDigits:2})}`;
-                document.getElementById('pix').innerText = `R$ ${data.pix.toLocaleString('pt-BR',{minimumFractionDigits:2})}`;
+                document.getElementById('edi').innerText = data.edi.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+                document.getElementById('pix').innerText = data.pix.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
                 
                 let t = 0;
                 data.tabela.forEach(item => {
                     t += item.valor;
-                    document.getElementById('tabela').innerHTML += `<tr><td>${item.tipo}</td><td>${item.banco}</td><td style="text-align:right; font-weight:bold;">R$ ${item.valor.toLocaleString('pt-BR',{minimumFractionDigits:2})}</td></tr>`;
+                    document.getElementById('tabela').innerHTML += `<tr><td>${item.tipo}</td><td>${item.banco}</td><td class="val-col">${item.valor.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</td></tr>`;
                 });
-                document.getElementById('total').innerText = `R$ ${t.toLocaleString('pt-BR',{minimumFractionDigits:2})}`;
+                
+                document.getElementById('total').innerText = t.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
                 document.getElementById('loader').style.display = 'none';
                 document.getElementById('main').style.display = 'block';
             })
-            .catch(error => {
-                document.getElementById('loader').innerText = "Erro na conexão com o Google.";
-            });
+            .catch(() => { document.getElementById('loader').innerText = "Erro de conexão com o servidor Google."; });
         } else {
-            document.getElementById('loader').innerText = "Token ausente.";
+            document.getElementById('loader').innerText = "Aguardando token de acesso...";
         }
     </script>
 </body>
