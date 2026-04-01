@@ -3,36 +3,58 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Aprovação de Pagamentos | Ambipar</title>
+    <title>Aprovação de Pagamentos | Ambipar Group</title>
     <style>
-        body { font-family: 'Segoe UI', sans-serif; background: #f4f7f6; margin: 0; display: flex; justify-content: center; align-items: center; min-height: 100vh; }
-        .card { background: white; width: 100%; max-width: 450px; border-radius: 20px; box-shadow: 0 15px 35px rgba(0,0,0,0.1); overflow: hidden; }
-        .header { background: #009639; padding: 40px 20px; text-align: center; }
-        .logo { width: 160px; filter: brightness(0) invert(1); }
+        :root { --ambipar-green: #009639; --dark-blue: #1a3c5a; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f4f7f6; margin: 0; display: flex; justify-content: center; align-items: center; min-height: 100vh; }
+        .card { background: white; width: 100%; max-width: 480px; border-radius: 20px; box-shadow: 0 15px 35px rgba(0,0,0,0.1); overflow: hidden; }
+        .header { background: var(--ambipar-green); padding: 40px 20px; text-align: center; }
+        .logo { width: 160px; filter: brightness(0) invert(1); margin-bottom: 10px; }
+        .header-title { color: white; font-size: 0.9rem; letter-spacing: 2px; text-transform: uppercase; opacity: 0.9; }
         .content { padding: 30px; text-align: center; }
-        .valor-total { font-size: 2.5rem; font-weight: bold; color: #1a3c5a; margin: 10px 0; }
-        .label { color: #888; text-transform: uppercase; font-size: 0.7rem; letter-spacing: 1px; }
-        .breakdown { display: flex; justify-content: space-between; margin: 25px 0; gap: 10px; }
-        .box { background: #f8f9fa; padding: 15px; border-radius: 10px; flex: 1; border-top: 3px solid #009639; }
-        .box-val { font-weight: bold; color: #1a3c5a; font-size: 0.9rem; }
-        .details { text-align: left; font-size: 0.85rem; color: #555; border-top: 1px solid #eee; padding-top: 20px; }
-        button { background: #009639; color: white; border: none; width: 100%; padding: 18px; border-radius: 12px; font-size: 1rem; font-weight: bold; cursor: pointer; transition: 0.3s; margin-top: 20px; }
-        button:hover { background: #007a2e; }
-        #loader { padding: 50px; color: #009639; font-weight: bold; }
+        .total-box { margin-bottom: 25px; }
+        .label { color: #888; text-transform: uppercase; font-size: 0.75rem; letter-spacing: 1px; font-weight: 600; }
+        .valor-total { font-size: 2.8rem; font-weight: 800; color: var(--dark-blue); margin: 5px 0; letter-spacing: -1px; }
+        
+        .breakdown { display: flex; justify-content: space-between; gap: 15px; margin-bottom: 30px; }
+        .box { background: #f8f9fa; padding: 15px; border-radius: 12px; flex: 1; border-top: 4px solid var(--ambipar-green); }
+        .box-val { font-weight: 700; color: var(--dark-blue); font-size: 1rem; margin-top: 5px; }
+
+        .details { text-align: left; font-size: 0.9rem; color: #555; border-top: 1px solid #eee; padding-top: 25px; line-height: 1.6; }
+        .detail-item { display: flex; justify-content: space-between; margin-bottom: 8px; }
+        .detail-item b { color: #333; }
+
+        button { background: var(--ambipar-green); color: white; border: none; width: 100%; padding: 20px; border-radius: 12px; font-size: 1.1rem; font-weight: bold; cursor: pointer; transition: 0.3s; margin-top: 25px; box-shadow: 0 4px 12px rgba(0, 150, 57, 0.2); }
+        button:hover { background: #007a2e; transform: translateY(-2px); }
+        
+        #loader { padding: 60px; text-align: center; color: var(--ambipar-green); font-weight: bold; }
+        #error-msg { color: #e74c3c; padding: 20px; display: none; }
     </style>
 </head>
 <body>
 
 <div class="card">
-    <div id="loader">Carregando dados seguros...</div>
+    <div id="loader">
+        <div style="margin-bottom: 15px;">Verificando credenciais seguras...</div>
+        <small style="color: #999; font-weight: normal;">Ambipar Financeiro</small>
+    </div>
+
+    <div id="error-msg" style="text-align:center;">
+        <h3>Acesso Inválido</h3>
+        <p>O token de liberação não foi encontrado ou já expirou.</p>
+    </div>
     
-    <div id="main" style="display:none;">
+    <div id="main-content" style="display:none;">
         <div class="header">
-            <img src="https://ambipar.com/wp-content/uploads/2022/05/logo-ambipar.png" class="logo">
+            <img src="https://ambipar.com/wp-content/uploads/2022/05/logo-ambipar.png" alt="Ambipar Logo" class="logo">
+            <div class="header-title">Liberação de Pagamentos</div>
         </div>
+        
         <div class="content">
-            <div class="label">Total para Liberação</div>
-            <div class="valor-total" id="valTotal">R$ 0,00</div>
+            <div class="total-box">
+                <div class="label">Valor Total do Lote</div>
+                <div class="valor-total" id="valTotal">R$ 0,00</div>
+            </div>
 
             <div class="breakdown">
                 <div class="box">
@@ -46,47 +68,66 @@
             </div>
 
             <div class="details">
-                <div style="margin-bottom: 5px;">Empresa: <b id="txtEmpresa">-</b></div>
-                <div style="margin-bottom: 5px;">CNPJ: <span id="txtCNPJ">-</span></div>
-                <div>Banco Destino: <span id="txtBanco">-</span></div>
+                <div class="detail-item"><span>Empresa:</span> <b id="txtEmpresa">-</b></div>
+                <div class="detail-item"><span>CNPJ:</span> <span id="txtCNPJ">-</span></div>
+                <div class="detail-item"><span>Banco Destino:</span> <span id="txtBanco">-</span></div>
             </div>
 
-            <button onclick="confirmar()">Botão de confirmação após liberação</button>
+            <button onclick="confirmarLiberacao()">Botão de confirmação após liberação</button>
         </div>
     </div>
 
-    <div id="success" style="display:none; padding: 60px 30px; text-align:center;">
-        <h2 style="color: #009639;">✓ Confirmado!</h2>
-        <p>A liberação foi registrada no sistema.</p>
+    <div id="success-screen" style="display:none; padding: 60px 30px; text-align:center;">
+        <div style="font-size: 50px; color: var(--ambipar-green); margin-bottom: 20px;">✓</div>
+        <h2 style="color: var(--dark-blue); margin-bottom: 10px;">Confirmado!</h2>
+        <p style="color: #666;">A liberação foi registada com sucesso no sistema financeiro.</p>
     </div>
 </div>
 
 <script>
-    const scriptURL = 'SUA_URL_DO_APPS_SCRIPT_AQUI';
+    // URL do seu Google Apps Script (Versão de Execução)
+    const scriptURL = 'https://script.google.com/macros/s/AKfycbx9HgssF2pLN5YpzHjKFjkPxikQKUZ3v8r5MLVzW0TAHJODh2BlQuP3u4hXnOWASUA0/exec';
+    
+    // Captura o token da URL do navegador
     const params = new URLSearchParams(window.location.search);
     const token = params.get('token');
 
-    if(token) {
+    if (!token) {
+        document.getElementById('loader').style.display = 'none';
+        document.getElementById('error-msg').style.display = 'block';
+    } else {
+        // Faz a chamada ao Google para buscar os dados do pagamento
         fetch(`${scriptURL}?token=${token}`)
-        .then(r => r.json())
-        .then(d => {
-            if(d.error) { document.getElementById('loader').innerText = "Erro: Token não encontrado."; return; }
-            
-            document.getElementById('valTotal').innerText = `R$ ${parseFloat(d.valorTotal).toLocaleString('pt-BR', {minimumFractionDigits: 2})}`;
-            document.getElementById('valEDI').innerText = `R$ ${parseFloat(d.valorEDI).toLocaleString('pt-BR', {minimumFractionDigits: 2})}`;
-            document.getElementById('valPix').innerText = `R$ ${parseFloat(d.valorPix).toLocaleString('pt-BR', {minimumFractionDigits: 2})}`;
-            document.getElementById('txtEmpresa').innerText = d.empresa;
-            document.getElementById('txtCNPJ').innerText = d.cnpj;
-            document.getElementById('txtBanco').innerText = d.banco;
+        .then(response => response.json())
+        .then(dados => {
+            if (dados.error) {
+                document.getElementById('loader').style.display = 'none';
+                document.getElementById('error-msg').style.display = 'block';
+            } else {
+                // Preenche os valores no site com formatação de moeda brasileira
+                document.getElementById('valTotal').innerText = `R$ ${parseFloat(dados.valorTotal).toLocaleString('pt-BR', {minimumFractionDigits: 2})}`;
+                document.getElementById('valEDI').innerText = `R$ ${parseFloat(dados.valorEDI).toLocaleString('pt-BR', {minimumFractionDigits: 2})}`;
+                document.getElementById('valPix').innerText = `R$ ${parseFloat(dados.valorPix).toLocaleString('pt-BR', {minimumFractionDigits: 2})}`;
+                
+                document.getElementById('txtEmpresa').innerText = dados.empresa;
+                document.getElementById('txtCNPJ').innerText = dados.cnpj;
+                document.getElementById('txtBanco').innerText = dados.banco;
 
-            document.getElementById('loader').style.display = 'none';
-            document.getElementById('main').style.display = 'block';
+                // Mostra o conteúdo principal e esconde o loader
+                document.getElementById('loader').style.display = 'none';
+                document.getElementById('main-content').style.display = 'block';
+            }
+        })
+        .catch(error => {
+            console.error('Erro ao carregar dados:', error);
+            document.getElementById('loader').innerText = "Erro ao conectar com o servidor financeiro.";
         });
     }
 
-    function confirmar() {
-        document.getElementById('main').style.display = 'none';
-        document.getElementById('success').style.display = 'block';
+    function confirmarLiberacao() {
+        // Transição para tela de sucesso
+        document.getElementById('main-content').style.display = 'none';
+        document.getElementById('success-screen').style.display = 'block';
     }
 </script>
 </body>
